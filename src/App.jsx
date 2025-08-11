@@ -23,7 +23,7 @@ const products = productsFromServer.map(product => {
   return { product, category, user };
 });
 
-function sortProducts(p, chosenUser, chosedFilters, query) {
+function sortProducts(p, chosenUser, filters, query) {
   let res = [...p];
 
   if (query) {
@@ -38,10 +38,10 @@ function sortProducts(p, chosenUser, chosedFilters, query) {
     res = res.filter(prepProduct => prepProduct.user.name === chosenUser);
   }
 
-  if (chosedFilters.length !== 0) {
-    res = res.filter(prepProduct =>
-      chosedFilters.includes(prepProduct.category.title),
-    );
+  if (filters.length !== 0) {
+    res = res.filter(prepProduct => {
+      return filters.includes(prepProduct.category.title);
+    });
   }
 
   return res;

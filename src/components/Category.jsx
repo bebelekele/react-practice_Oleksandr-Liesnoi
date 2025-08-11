@@ -1,10 +1,6 @@
 import cn from 'classnames';
 
-export const Category = ({
-  category,
-  chosedFilters,
-  setFilter,
-}) => (
+export const Category = ({ category, chosedFilters, setFilter }) => (
   <a
     data-cy="Category"
     href="#/"
