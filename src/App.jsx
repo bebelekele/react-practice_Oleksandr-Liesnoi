@@ -21,7 +21,7 @@ const products = productsFromServer.map(product => {
   return { product, category, user };
 });
 
-function sortProducts(p, chosenUser, query) {
+function sortProducts(p, chosenUser, chosenFilter, query) {
   let res = [...p];
 
   if (query) {
@@ -36,13 +36,19 @@ function sortProducts(p, chosenUser, query) {
     res = res.filter(prepProduct => prepProduct.user.name === chosenUser);
   }
 
+  if (chosenFilter) {
+    res = res.filter(prepProduct => prepProduct.category.title === chosenFilter);
+  }
+
   return res;
 }
 
 export const App = () => {
   const [chosenUser, setUser] = useState('');
   const [query, setQuery] = useState('');
-  const sortedProducts = sortProducts(products, chosenUser, query);
+  const [chosenFilter, setFilter] = useState('');
+
+  const sortedProducts = sortProducts(products, chosenUser, chosenFilter, query);
 
   return (
     <div className="section">
@@ -88,7 +94,7 @@ export const App = () => {
                 )}
               </p>
             </div>
-            <Categories categories={categoriesFromServer} />
+            <Categories categories={categoriesFromServer} chosenFilter={chosenFilter} setFilter={setFilter} />
           </nav>
         </div>
 
