@@ -1,7 +1,13 @@
 import cn from 'classnames';
 import { Category } from './Category';
 
-export const Categories = ({ categories, chosenFilter, setFilter }) => (
+export const Categories = ({
+  categories,
+  chosenFilter,
+  chosedFilters,
+  setFilter,
+  setUser,
+}) => (
   <>
     <div className="panel-block is-flex-wrap-wrap">
       <a
@@ -20,6 +26,7 @@ export const Categories = ({ categories, chosenFilter, setFilter }) => (
           category={category}
           key={category.id}
           chosenFilter={chosenFilter}
+          chosedFilters={chosedFilters}
           setFilter={setFilter}
         />
       ))}
@@ -29,6 +36,10 @@ export const Categories = ({ categories, chosenFilter, setFilter }) => (
         data-cy="ResetAllButton"
         href="#/"
         className="button is-link is-outlined is-fullwidth"
+        onClick={() => {
+          setFilter('');
+          setUser('');
+        }}
       >
         Reset all filters
       </a>

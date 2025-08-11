@@ -1,3 +1,5 @@
+import cn from 'classnames';
+
 export const Product = ({ prepProduct }) => {
   return (
     <tr data-cy="Product">
@@ -10,7 +12,13 @@ export const Product = ({ prepProduct }) => {
         {prepProduct.category.icon} - {prepProduct.category.title}
       </td>
 
-      <td data-cy="ProductUser" className="has-text-link">
+      <td
+        data-cy="ProductUser"
+        className={cn({
+          'has-text-link': prepProduct.user.sex === 'm',
+          'has-text-danger': prepProduct.user.sex === 'f',
+        })}
+      >
         {prepProduct.user.name}
       </td>
     </tr>
