@@ -1,21 +1,29 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React from 'react';
+import React, { useState } from 'react';
+import cn from 'classnames';
 import './App.scss';
 import { FilterUsers } from './components/FilterUsers';
 import { Product } from './components/Product';
+import { Category } from './components/Category';
 
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
 
-const products = productsFromServer.map((product) => {
-  const category = categoriesFromServer.find(categoryServer => categoryServer.id === product.categoryId); // find by product.categoryId
-  const user = usersFromServer.find(userServer => userServer.id === category.ownerId); // find by category.ownerId
+const products = productsFromServer.map(product => {
+  const category = categoriesFromServer.find(
+    categoryServer => categoryServer.id === product.categoryId,
+  );
+  const user = usersFromServer.find(
+    userServer => userServer.id === category.ownerId,
+  );
 
-  return {product, category, user};
+  return { product, category, user };
 });
 
 export const App = () => {
+  const [chosenUser, setUser] = useState('');
+  const [query, setQuery] = useState('');
 
   return (
     <div className="section">
@@ -27,12 +35,22 @@ export const App = () => {
             <p className="panel-heading">Filters</p>
 
             <p className="panel-tabs has-text-weight-bold">
-              <a data-cy="FilterAllUsers" href="#/" className="is-active">
+              <a
+                data-cy="FilterAllUsers"
+                href="#/"
+                onClick={() => setUser('')}
+                className={cn({ 'is-active': chosenUser === '' })}
+              >
                 All
               </a>
 
               {usersFromServer.map(user => (
-                <FilterUsers user={user} key={user.id} />
+                <FilterUsers
+                  user={user}
+                  chosenUser={chosenUser}
+                  setUser={setUser}
+                  key={user.id}
+                />
               ))}
             </p>
 
@@ -43,21 +61,28 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={query}
+                  onChange={event => {
+                    setQuery(event.target.value);
+                  }}
                 />
 
                 <span className="icon is-left">
                   <i className="fas fa-search" aria-hidden="true" />
                 </span>
-
-                <span className="icon is-right">
-                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                  <button
-                    data-cy="ClearButton"
-                    type="button"
-                    className="delete"
-                  />
-                </span>
+                {query !== '' ? (
+                  <span className="icon is-right">
+                    {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                    <button
+                      data-cy="ClearButton"
+                      type="button"
+                      className="delete"
+                      onClick={() => setQuery('')}
+                    />
+                  </span>
+                ) : (
+                  ''
+                )}
               </p>
             </div>
 
@@ -69,29 +94,9 @@ export const App = () => {
               >
                 All
               </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 4
-              </a>
+              {categoriesFromServer.map(category => (
+                <Category category={category} key={category.id} />
+              ))}
             </div>
 
             <div className="panel-block">
@@ -164,7 +169,12 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map(prepProduct => <Product prepProduct={prepProduct} key={prepProduct.product.id}/>)}
+              {products.map(prepProduct => (
+                <Product
+                  prepProduct={prepProduct}
+                  key={prepProduct.product.id}
+                />
+              ))}
             </tbody>
           </table>
         </div>
