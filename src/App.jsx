@@ -1,10 +1,10 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 import React, { useState } from 'react';
-import cn from 'classnames';
 import './App.scss';
-import { FilterUsers } from './components/FilterUsers';
-import { Product } from './components/Product';
-import { Category } from './components/Category';
+
+import { ProductTable } from './components/ProductTable';
+import { Filters } from './components/Filters';
+import { Categories } from './components/Categories';
 
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
@@ -21,9 +21,28 @@ const products = productsFromServer.map(product => {
   return { product, category, user };
 });
 
+function sortProducts(p, chosenUser, query) {
+  let res = [...p];
+
+  if (query) {
+    res = res.filter(prepProduct => {
+      return prepProduct.product.name
+        .toLowerCase()
+        .includes(query.toLowerCase().trim());
+    });
+  }
+
+  if (chosenUser) {
+    res = res.filter(prepProduct => prepProduct.user.name === chosenUser);
+  }
+
+  return res;
+}
+
 export const App = () => {
   const [chosenUser, setUser] = useState('');
   const [query, setQuery] = useState('');
+  const sortedProducts = sortProducts(products, chosenUser, query);
 
   return (
     <div className="section">
@@ -32,27 +51,11 @@ export const App = () => {
 
         <div className="block">
           <nav className="panel">
-            <p className="panel-heading">Filters</p>
-
-            <p className="panel-tabs has-text-weight-bold">
-              <a
-                data-cy="FilterAllUsers"
-                href="#/"
-                onClick={() => setUser('')}
-                className={cn({ 'is-active': chosenUser === '' })}
-              >
-                All
-              </a>
-
-              {usersFromServer.map(user => (
-                <FilterUsers
-                  user={user}
-                  chosenUser={chosenUser}
-                  setUser={setUser}
-                  key={user.id}
-                />
-              ))}
-            </p>
+            <Filters
+              users={usersFromServer}
+              chosenUser={chosenUser}
+              setUser={setUser}
+            />
 
             <div className="panel-block">
               <p className="control has-icons-left has-icons-right">
@@ -85,98 +88,18 @@ export const App = () => {
                 )}
               </p>
             </div>
-
-            <div className="panel-block is-flex-wrap-wrap">
-              <a
-                href="#/"
-                data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
-              >
-                All
-              </a>
-              {categoriesFromServer.map(category => (
-                <Category category={category} key={category.id} />
-              ))}
-            </div>
-
-            <div className="panel-block">
-              <a
-                data-cy="ResetAllButton"
-                href="#/"
-                className="button is-link is-outlined is-fullwidth"
-              >
-                Reset all filters
-              </a>
-            </div>
+            <Categories categories={categoriesFromServer} />
           </nav>
         </div>
 
         <div className="box table-container">
-          <p data-cy="NoMatchingMessage">
-            No products matching selected criteria
-          </p>
-
-          <table
-            data-cy="ProductTable"
-            className="table is-striped is-narrow is-fullwidth"
-          >
-            <thead>
-              <tr>
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    ID
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    Product
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort-down" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    Category
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort-up" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-
-                <th>
-                  <span className="is-flex is-flex-wrap-nowrap">
-                    User
-                    <a href="#/">
-                      <span className="icon">
-                        <i data-cy="SortIcon" className="fas fa-sort" />
-                      </span>
-                    </a>
-                  </span>
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {products.map(prepProduct => (
-                <Product
-                  prepProduct={prepProduct}
-                  key={prepProduct.product.id}
-                />
-              ))}
-            </tbody>
-          </table>
+          {sortedProducts.length === 0 ? (
+            <p data-cy="NoMatchingMessage">
+              No products matching selected criteria
+            </p>
+          ) : (
+            <ProductTable sortedProducts={sortedProducts} />
+          )}
         </div>
       </div>
     </div>
